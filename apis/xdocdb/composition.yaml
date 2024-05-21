@@ -1,0 +1,54 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xdocdb.example.crossplane.io
+spec:
+  compositeTypeRef:
+    apiVersion: example.crossplane.io/v1alpha1
+    kind: XDocDB
+  mode: Pipeline
+  pipeline:
+    - step: pull-extra-resources
+      functionRef:
+        name: crossplane-contrib-function-extra-resources
+      input:
+        apiVersion: extra-resources.fn.crossplane.io/v1beta1
+        kind: Input
+        spec:
+          extraResources:
+            - kind: XBackupPolicy
+              into: backupPolicy
+              apiVersion: example.crossplane.io/v1alpha1
+              type: Selector
+              selector:
+                maxMatch: 1
+                minMatch: 1
+                matchLabels:
+                  - key: environment
+                    type: FromCompositeFieldPath
+                    valueFromFieldPath: spec.parameters.environment
+    - step: template-resources
+      functionRef:
+        name: crossplane-contrib-function-go-templating
+      input:
+        apiVersion: gotemplating.fn.crossplane.io/v1beta1
+        kind: GoTemplate
+        source: Inline
+        inline:
+          template: |
+            # Fetch the values for the first matching environmentConfig from extra-resources
+            {{- $backupPolicy := index .context "apiextensions.crossplane.io/extra-resources" "backupPolicy" 0 }}
+            ---
+            apiVersion: {{ .observed.composite.resource.apiVersion }}
+            kind: {{ .observed.composite.resource.kind }}
+            {{ if $backupPolicy }}
+            status: 
+            {{ $backupPolicy | toYaml | nindent 4 }}
+            {{ else }}
+            status: {} 
+            {{ end }}
+    - step: automatically-detect-ready-composed-resources
+      functionRef:
+        name: crossplane-contrib-function-auto-ready
+
+

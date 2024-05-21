@@ -1,0 +1,39 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xdocdbs.example.crossplane.io
+spec:
+  group: example.crossplane.io
+  claimNames:
+    kind: DocDB
+    plural: docdbs
+  names:
+    kind: XDocDB
+    plural: xdocdbs
+  versions:
+    - name: v1alpha1
+      referenceable: true
+      served: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+                    environment:
+                      default: dev
+                      type: string
+                      enum: 
+                      - dev
+                      - test
+                      - prod
+            status:
+              type: object
+              properties:
+                namespaces:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true 

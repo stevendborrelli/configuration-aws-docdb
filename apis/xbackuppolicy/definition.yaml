@@ -1,0 +1,50 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xbackuppolicys.example.crossplane.io
+spec:
+  group: example.crossplane.io
+  names:
+    kind: XBackupPolicy
+    listKind: XBackupPolicyList
+    plural: xbackuppolicys
+    singular: xbackuppolicy
+  claimNames:
+    kind: BackupPolicy
+    listKind: BackupPolicyList
+    plural: backuppolicys
+    singular: backuppolicy
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          description: Backup Policy
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  properties:
+                    backupRetentionPeriod:
+                      description: The days to retain backups for. Default 1
+                      default: 1
+                      type: number
+                    copyTagsToSnapshot:
+                      description: Copy all DB instance tags to snapshots. Default is false.
+                      type: boolean
+                    preferredBackupWindow:
+                      description: The daily time range during which automated backups are created if automated backups are enabled.
+                      type: string
+                    preferredMaintenanceWindow:
+                      description: |-
+                        The window to perform maintenance in.
+                        Syntax: "ddd:hh24:mi-ddd:hh24:mi". Eg: "Mon:00:00-Mon:03:00".
+                      type: string
+                    skipFinalSnapshot:
+                      default: false
+                      description: Determines whether a final DB snapshot is created before the DB cluster is deleted. If true is specified, no DB snapshot is created. If false is specified, a DB snapshot is created before the DB cluster is deleted, using the value from final_snapshot_identifier. Default is false.
+                      type: boolean

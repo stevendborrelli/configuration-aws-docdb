@@ -1,0 +1,11 @@
+apiVersion: example.crossplane.io/v1alpha1
+kind: XBackupPolicy
+metadata:
+  name: test
+  labels:
+    environment: test
+spec:
+  parameters:
+    backupRetentionPeriod: 3
+    skipFinalSnapshot: true
+  

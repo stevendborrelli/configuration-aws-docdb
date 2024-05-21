@@ -1,0 +1,11 @@
+apiVersion: example.crossplane.io/v1alpha1
+kind: XDocDB
+metadata:
+  name: dev
+  labels:
+    environment: dev
+spec:
+  parameters:
+    environment: dev
+
+  
